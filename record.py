@@ -49,6 +49,11 @@ sql_insertUserWeight = """
 INSERT INTO {} VALUES(?, ?, ?);
 """
 
+# 查找用户的体重信息，一天之内
+sql_listUserWeight = """
+SELECT time, weight FROM {} WHERE date = ?;
+"""
+
 
 class DBHandle:
 
@@ -89,22 +94,40 @@ class DBHandle:
         "列出所有用户, 返回用户名的列表（用户不会太多，所以直接查找全部）"
         sc = self.conn.cursor()
         sc.execute(sql_listUser)
+        self.conn.commit()
         return [i[0] for i in sc.fetchall()]
 
     def insertUserWeight(self, name, weight):
         "插入用户体重，时间实时生成.weight数字， name字符串"
         # 生成时间
         now = datetime.now()
-        date = now.strftime("%x")
-        time = now.strftime("%X")
+        date = str(now.strftime("%x"))
+        time = str(now.strftime("%X"))
 
         sc = self.conn.cursor()
-        sc.execute(sql_insertUserWeight.format(name), (weight, date, time))
+        sc.execute(sql_insertUserWeight.format(name), (date, time, weight))
         self.conn.commit()
         return None
+
+    def listUserWeight(self,
+                       name,
+                       date=str(datetime.now().strftime("%x"))):
+        """
+        返回元组的列表(默认当天)，没有查找到返回空表。
+        元组第一项为当天时间，第二项为体重
+        因为一天中也不可能次数太多，所以fetchall，这里性能受限于查找的速度
+        """
+        sc = self.conn.cursor()
+        sc.execute(sql_listUserWeight.format(name), (date,))
+        self.conn.commit()
+        return sc.fetchall()
 
 
 db = DBHandle("weight.db")
 db.createUser("lzy")
 db.insertUserWeight("lzy", 49)
+# now = datetime.now()
+# date = str(now.strftime("%x"))
+print db.listUserWeight("lzy")
 del db
+os.system("rm weight.db")
