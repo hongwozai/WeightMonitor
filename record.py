@@ -7,6 +7,7 @@
 # 两个表user,user_weight(对应与具体用户名)
 # user (name, waist腰围, height身高)
 # user_weight (date, time, weight)
+# TODO: 针对用户的导入导出功能
 
 import os
 import sqlite3
@@ -117,8 +118,8 @@ class DBHandle:
         "插入用户体重，时间实时生成.weight数字， name字符串"
         # 生成时间
         now = datetime.now()
-        date = str(now.strftime("%x"))
-        time = str(now.strftime("%X"))
+        date = str(now.strftime("%Y-%m-%d"))
+        time = str(now.strftime("%H:%M:%S"))
 
         sc = self.conn.cursor()
         sc.execute(sql_insertUserWeight.format(name), (date, time, weight))
@@ -127,7 +128,7 @@ class DBHandle:
 
     def listUserWeightToday(self,
                             name,
-                            date=str(datetime.now().strftime("%x"))):
+                            date=str(datetime.now().strftime("%Y-%m-%d"))):
         """
         返回元组的列表(默认当天)，没有查找到返回空表。
         元组第一项为当天时间，第二项为体重
@@ -155,13 +156,13 @@ class DBHandle:
 
     def listUserWeightWeek(self,
                            name,
-                           date=str(datetime.now().strftime("%x"))):
+                           date=str(datetime.now().strftime("%Y-%m-%d"))):
         """
         列出指定用户本周的所有数据。返回值同listUserWeightToday类似。
         可能不足7天，也可能没有数据（空表）
         """
         # 找到本周开始的一天
-        date = datetime.strptime(date, "%x")
+        date = datetime.strptime(date, "%Y-%m-%d")
         week_today = date.isoweekday()
         start = date - timedelta(week_today)
 
@@ -171,9 +172,9 @@ class DBHandle:
         week_weight = []
         for i in range(7):
             start += one
-            print str(start.strftime("%x"))
+            # print str(start.strftime("%Y-%m-%d"))
             sc.execute(sql_queryUserWeight.format(name),
-                       (str(start.strftime("%x")), ))
+                       (str(start.strftime("%Y-%m-%d")), ))
             self.conn.commit()
             data = sc.fetchone()
             if data is not None:
