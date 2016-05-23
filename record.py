@@ -17,8 +17,6 @@ from datetime import datetime, timedelta
 sql_user = """
 CREATE TABLE user (
 name text,
-waist real,
-height real,
 PRIMARY KEY (name)
 );
 """
@@ -41,7 +39,7 @@ CREATE INDEX {0}_idx ON {0}(date);
 
 # 创建用户项
 sql_createUser = """
-INSERT INTO user VALUES(?, ?, ?);
+INSERT INTO user VALUES(?);
 """
 
 # 列出用户
@@ -98,10 +96,10 @@ class DBHandle:
         self.conn.commit()
         return None
 
-    def createUser(self, name, waist=0, height=0):
+    def createUser(self, name):
         "创建用户，同时会创建用户的体重记录表"
         sc = self.conn.cursor()
-        sc.execute(sql_createUser, (name, waist, height))
+        sc.execute(sql_createUser, (name,))
         sc.execute(sql_weight.format(name))
         sc.execute(sql_weight_index.format(name))
         self.conn.commit()
