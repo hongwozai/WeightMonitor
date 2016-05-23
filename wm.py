@@ -50,16 +50,17 @@ class WM:
 
     def monitorEveryday(self):
         # 获得计算数据
+        l = self.db.listUserWeightEveryday(self.name)
         d = []
         w = []
-        for i in sorted(self.db.listUserWeightEveryday(self.name),
-                        cmp=CompareDate,
-                        key=lambda x: x[0]):
+        for i in sorted(l, cmp=CompareDate, key=lambda x: x[0]):
             d.append(i[0])
             w.append(i[1])
         d.reverse()
         w.reverse()
         day = d
+        if d == []:
+            return False
 
         # 基准
         total = len(d)
@@ -70,8 +71,8 @@ class WM:
 
         d = [time.mktime(time.strptime(i, "%Y-%m-%d")) - start for i in d]
         # 画图
-        fig = plt.figure(figsize=(12, 6))
-        plt.plot(d, w, "")
+        plt.figure(figsize=(12, 6))
+        plt.plot(d, w, "*-")
 
         # 设置坐标刻度
         day = [i[5:] for i in day]
@@ -88,10 +89,12 @@ class WM:
         plt.xlabel("time")
         plt.ylabel("weight")
         plt.show()
-        return None
+        return True
 
     def monitorToday(self):
         l = self.db.listUserWeightToday(self.name)
+        if l == []:
+            return False
         l.sort(cmp=CompareTime, key=lambda x: x[0])
 
         # 获得基准（体重是今日第一次量的上下加10，时间是从6点到24点）
@@ -107,8 +110,8 @@ class WM:
         w = [i[1] for i in l]
 
         # 画图
-        fig = plt.figure(figsize=(12, 6))
-        plt.plot(t, w, "")
+        plt.figure(figsize=(12, 6))
+        plt.plot(t, w, "*-")
 
         # 设置坐标刻度
         ax = plt.gca()
@@ -123,7 +126,7 @@ class WM:
         plt.xlabel("time")
         plt.ylabel("weight")
         plt.show()
-        return None
+        return True
 
 
 # 测试使用
