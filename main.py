@@ -7,6 +7,7 @@
 
 import os
 import re
+import shutil
 import Tkinter as Tk
 from tkMessageBox import showwarning
 
@@ -188,10 +189,15 @@ class RecordWindow:
 database = "~/.record/record.db"
 
 if __name__ == '__main__':
-    database = os.path.expanduser(os.path.dirname(database))
+    database = os.path.expanduser(database)
+    print "Database Dir: {}".format(database)
+    print "Database File: {}".format(os.path.basename(database))
     dbdir = os.path.dirname(database)
     if not os.path.exists(dbdir):
         os.mkdir(dbdir)
     db = DBHandle(database)
     login = LoginWindow(db)
     login.run()
+    print "Finished..."
+    print "Backup..."
+    shutil.copyfile(database, os.path.basename(database))

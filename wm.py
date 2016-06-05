@@ -72,7 +72,10 @@ class WM:
         d = [time.mktime(time.strptime(i, "%Y-%m-%d")) - start for i in d]
         # 画图
         plt.figure(figsize=(12, 6))
-        plt.plot(d, w, "*-")
+        plt.plot(d, w, "o-")
+        for i in xrange(0, len(w)):
+            data = "{0:3.2f}".format(w[i])
+            plt.annotate(data, xy=(d[i], w[i]))
 
         # 设置坐标刻度
         day = [i[5:] for i in day]
@@ -111,7 +114,9 @@ class WM:
 
         # 画图
         plt.figure(figsize=(12, 6))
-        plt.plot(t, w, "*-")
+        plt.plot(t, w, "o-")
+        for i in xrange(0, len(w)):
+            plt.annotate(str(w[i]), xy=(t[i], w[i]))
 
         # 设置坐标刻度
         ax = plt.gca()
